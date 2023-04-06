@@ -12,11 +12,28 @@ public class HomeMainServlet3 extends HttpServlet {
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("text/html; charset=UTF-8");
-
-		response.getWriter().append("8단<br>");
-
-		int dan = 8;
-		for (int i = 1; i <= 9; i++) {
+		
+		// dan 이라는 파라미터 값 가져오기
+		String inputedDan = request.getParameter("dan");
+		String inputedLimit = request.getParameter("limit");
+		
+		// 파라미터 없을 시, 기본값 넣어주기
+		if (inputedDan == null) {
+			inputedDan = "1";
+		}
+		
+		if (inputedLimit == null) {
+			inputedLimit = "1";
+		}
+		
+		// 파라미터(문자열) 값을 숫자로 변환
+		int dan = Integer.parseInt(inputedDan);
+		int limit = Integer.parseInt(inputedLimit);
+		
+		// text/html 형식이므로 포맷팅 해주기
+		response.getWriter().append(String.format("==%d단==<br>", dan));
+		
+		for (int i = 1; i <= limit; i++) {
 			response.getWriter().append(String.format("%d * %d = %d<br>", dan, i, dan * i));
 		}
 	}
