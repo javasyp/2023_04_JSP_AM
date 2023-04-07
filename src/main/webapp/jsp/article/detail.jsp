@@ -27,7 +27,7 @@ Map<String, Object> articleRow = (Map<String, Object>) request.getAttribute("art
 		내용 :
 		<%=articleRow.get("body")%></div>
 	<div>
-		<a style="color: green" href="list">리스트로 돌아가기</a>
+		<a href="list" style="color: green">리스트로 돌아가기</a>
 	</div>
 </body>
 </html>
