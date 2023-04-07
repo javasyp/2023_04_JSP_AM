@@ -17,17 +17,17 @@ import com.KoreaIT.java.jam.util.DBUtil;
 
 @WebServlet("/article/list")
 public class ArticleListServlet extends HttpServlet {
-	
+
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
+
 		response.setContentType("text/html; charset=UTF-8");
-		
+
 		// DB 연결
 		Connection conn = null;
 		
 		String url = "jdbc:mysql://127.0.0.1:3306/JAM?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul&useOldAliasMetadataBehavior=true&zeroDateTimeNehavior=convertToNull";
 		String user = "root";
-		String pswd = "";
+		String password = "";
 		
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
@@ -36,10 +36,10 @@ public class ArticleListServlet extends HttpServlet {
 			e.printStackTrace();
 			return;
 		}
-		
+
 		try {
-			conn = DriverManager.getConnection(url, user, pswd);
-			
+			conn = DriverManager.getConnection(url, user, password);
+
 			response.getWriter().append("Success!!!");
 
 			DBUtil dbUtil = new DBUtil(request, response);
@@ -50,6 +50,10 @@ public class ArticleListServlet extends HttpServlet {
 
 			response.getWriter().append(articleRows.toString());
 			
+			request.setAttribute("articleRows", articleRows);
+			
+			request.getRequestDispatcher("/jsp/article/list.jsp").forward(request, response);
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
