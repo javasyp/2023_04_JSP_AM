@@ -13,7 +13,7 @@
 		<description></description>
 		<display-name>ArticleListServlet</display-name>
 		<servlet-name>ArticleListServlet</servlet-name>
-		<servlet-class>com.KoreaIT.java.jam.ArticleListServlet</servlet-class>
+		<servlet-class>com.KoreaIT.java.jam.servlet.ArticleListServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>ArticleListServlet</servlet-name>
@@ -23,7 +23,7 @@
 		<description></description>
 		<display-name>ArticleDetailServlet</display-name>
 		<servlet-name>ArticleDetailServlet</servlet-name>
-		<servlet-class>com.KoreaIT.java.jam.ArticleDetailServlet</servlet-class>
+		<servlet-class>com.KoreaIT.java.jam.servlet.ArticleDetailServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>ArticleDetailServlet</servlet-name>

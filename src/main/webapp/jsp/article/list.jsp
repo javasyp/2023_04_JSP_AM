@@ -12,6 +12,10 @@ List<Map<String, Object>> articleRows = (List<Map<String, Object>>) request.getA
 <title>게시물 리스트</title>
 </head>
 <body>
+	<div>
+		<a href="../home/main">메인페이지로 이동</a>
+	</div>
+	
 	<h1>게시물 리스트</h1>
 	
 	<ul>
