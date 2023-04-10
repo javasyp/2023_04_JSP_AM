@@ -39,6 +39,9 @@ public class ArticleDoModifyServlet extends HttpServlet {
 		try {
 			conn = DriverManager.getConnection(url, user, password);
 			
+			// get 방식이면 한글이 깨지지 않음 (현재 post 방식)
+			request.setCharacterEncoding("UTF-8");
+			
 			// 파라미터 값 받아오기
 			int id = Integer.parseInt(request.getParameter("id"));
 			String title = request.getParameter("title");
