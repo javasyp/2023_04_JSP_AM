@@ -16,8 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 import com.KoreaIT.java.jam.util.DBUtil;
 import com.KoreaIT.java.jam.util.SecSql;
 
-@WebServlet("/article/list")
-public class ArticleListServlet extends HttpServlet {
+@WebServlet("/article/doWrite")
+public class ArticleDoWriteServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -43,39 +43,18 @@ public class ArticleListServlet extends HttpServlet {
 
 			response.getWriter().append("Success!!!");
 			
-			// 페이징
-			int page = 1;		// 현재 페이지
+			// 파라미터 값 받아오기
+			String title = request.getParameter("title");
+			String body = request.getParameter("body");
 			
-			String paramPage = request.getParameter("page");
-						
-			if (paramPage != null && paramPage.length() != 0) {
-				page = Integer.parseInt(paramPage);
-			}
+			SecSql sql = SecSql.from("INSERT INTO article");
+			sql.append("SET regDate = NOW(),");
+			sql.append("title = ?,", title);
+			sql.append("`body` = ?;", body);
 			
-			int itemsInAPage = 10;		// 한 페이지에 보이는 글 개수
+			int id = DBUtil.insert(conn, sql);
 			
-			int limitFrom = (page - 1) * itemsInAPage;
-			
-			SecSql sql = SecSql.from("SELECT COUNT(*) AS cnt");
-			sql.append("FROM article;");
-			
-			int totalCnt = DBUtil.selectRowIntValue(conn, sql);		// 페이지 총 개수
-			int totalPage = (int) Math.ceil((double) totalCnt / itemsInAPage);		// 올림
-			
-			sql = SecSql.from("SELECT *");
-			sql.append("FROM article");
-			sql.append("ORDER BY id DESC");
-			sql.append("LIMIT ?, ?;", limitFrom, itemsInAPage);
-
-			List<Map<String, Object>> articleRows = DBUtil.selectRows(conn, sql);
-
-			response.getWriter().append(articleRows.toString());
-			
-			request.setAttribute("page", page);
-			request.setAttribute("totalPage", totalPage);
-			request.setAttribute("articleRows", articleRows);
-			
-			request.getRequestDispatcher("/jsp/article/list.jsp").forward(request, response);
+			response.getWriter().append(String.format("<script>alert('%d번 글이 생성되었습니다!'); location.replace('list');</script>", id));
 
 		} catch (SQLException e) {
 			e.printStackTrace();

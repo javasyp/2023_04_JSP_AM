@@ -48,7 +48,6 @@ int totalPage = (int) request.getAttribute("totalPage");
 	}
 	.page > a.red {
 		color: red;
-		text-weight: bold;
 	}
 	</style>
 	
