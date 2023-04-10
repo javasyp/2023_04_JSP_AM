@@ -18,7 +18,7 @@ import com.KoreaIT.java.jam.util.SecSql;
 
 @WebServlet("/article/doDelete")
 public class ArticleDoDeleteServlet extends HttpServlet {
-
+	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		response.setContentType("text/html; charset=UTF-8");
@@ -66,5 +66,9 @@ public class ArticleDoDeleteServlet extends HttpServlet {
 			}
 		}
 	}
-
+	
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		doGet(request, response);
+	}
 }
