@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,8 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 import com.KoreaIT.java.jam.util.DBUtil;
 import com.KoreaIT.java.jam.util.SecSql;
 
-@WebServlet("/article/list")
-public class ArticleListServlet extends HttpServlet {
+@WebServlet("/article/doModify")
+public class ArticleDoModifyServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -41,39 +39,20 @@ public class ArticleListServlet extends HttpServlet {
 		try {
 			conn = DriverManager.getConnection(url, user, password);
 			
-			// 페이징
-			int page = 1;		// 현재 페이지
+			// 파라미터 값 받아오기
+			int id = Integer.parseInt(request.getParameter("id"));
+			String title = request.getParameter("title");
+			String body = request.getParameter("body");
 			
-			String paramPage = request.getParameter("page");
-						
-			if (paramPage != null && paramPage.length() != 0) {
-				page = Integer.parseInt(paramPage);
-			}
+			SecSql sql = SecSql.from("UPDATE article");
+			sql.append("SET regDate = NOW(),");
+			sql.append("title = ?,", title);
+			sql.append("`body` = ?", body);
+			sql.append("WHERE id = ?;", id);
 			
-			int itemsInAPage = 10;		// 한 페이지에 보이는 글 개수
+			DBUtil.update(conn, sql);
 			
-			int limitFrom = (page - 1) * itemsInAPage;
-			
-			SecSql sql = SecSql.from("SELECT COUNT(*) AS cnt");
-			sql.append("FROM article;");
-			
-			int totalCnt = DBUtil.selectRowIntValue(conn, sql);		// 페이지 총 개수
-			int totalPage = (int) Math.ceil((double) totalCnt / itemsInAPage);		// 올림
-			
-			sql = SecSql.from("SELECT *");
-			sql.append("FROM article");
-			sql.append("ORDER BY id DESC");
-			sql.append("LIMIT ?, ?;", limitFrom, itemsInAPage);
-
-			List<Map<String, Object>> articleRows = DBUtil.selectRows(conn, sql);
-
-			response.getWriter().append(articleRows.toString());
-			
-			request.setAttribute("page", page);
-			request.setAttribute("totalPage", totalPage);
-			request.setAttribute("articleRows", articleRows);
-			
-			request.getRequestDispatcher("/jsp/article/list.jsp").forward(request, response);
+			response.getWriter().append(String.format("<script>alert('%d번 글이 수정되었습니다!'); location.replace('detail?id=%d');</script>", id, id));
 
 		} catch (SQLException e) {
 			e.printStackTrace();

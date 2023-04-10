@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -16,8 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import com.KoreaIT.java.jam.util.DBUtil;
 import com.KoreaIT.java.jam.util.SecSql;
 
-@WebServlet("/article/list")
-public class ArticleListServlet extends HttpServlet {
+@WebServlet("/article/modify")
+public class ArticleModifyServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -41,39 +40,20 @@ public class ArticleListServlet extends HttpServlet {
 		try {
 			conn = DriverManager.getConnection(url, user, password);
 			
-			// 페이징
-			int page = 1;		// 현재 페이지
-			
-			String paramPage = request.getParameter("page");
-						
-			if (paramPage != null && paramPage.length() != 0) {
-				page = Integer.parseInt(paramPage);
-			}
-			
-			int itemsInAPage = 10;		// 한 페이지에 보이는 글 개수
-			
-			int limitFrom = (page - 1) * itemsInAPage;
-			
-			SecSql sql = SecSql.from("SELECT COUNT(*) AS cnt");
-			sql.append("FROM article;");
-			
-			int totalCnt = DBUtil.selectRowIntValue(conn, sql);		// 페이지 총 개수
-			int totalPage = (int) Math.ceil((double) totalCnt / itemsInAPage);		// 올림
-			
-			sql = SecSql.from("SELECT *");
+			// 파라미터 값 받아오기
+			int id = Integer.parseInt(request.getParameter("id"));
+
+			SecSql sql = SecSql.from("SELECT *");
 			sql.append("FROM article");
-			sql.append("ORDER BY id DESC");
-			sql.append("LIMIT ?, ?;", limitFrom, itemsInAPage);
+			sql.append("WHERE id = ? ;", id);
 
-			List<Map<String, Object>> articleRows = DBUtil.selectRows(conn, sql);
+			Map<String, Object> articleRow = DBUtil.selectRow(conn, sql);
 
-			response.getWriter().append(articleRows.toString());
+			response.getWriter().append(articleRow.toString());
 			
-			request.setAttribute("page", page);
-			request.setAttribute("totalPage", totalPage);
-			request.setAttribute("articleRows", articleRows);
+			request.setAttribute("articleRow", articleRow);
 			
-			request.getRequestDispatcher("/jsp/article/list.jsp").forward(request, response);
+			request.getRequestDispatcher("/jsp/article/modify.jsp").forward(request, response);
 
 		} catch (SQLException e) {
 			e.printStackTrace();
