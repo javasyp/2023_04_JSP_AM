@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.KoreaIT.java.jam.config.Config;
 import com.KoreaIT.java.jam.util.DBUtil;
 import com.KoreaIT.java.jam.util.SecSql;
 
@@ -26,12 +27,8 @@ public class ArticleListServlet extends HttpServlet {
 		// DB 연결
 		Connection conn = null;
 		
-		String url = "jdbc:mysql://127.0.0.1:3306/JAM?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul&useOldAliasMetadataBehavior=true&zeroDateTimeNehavior=convertToNull";
-		String user = "root";
-		String password = "";
-		
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
+			Class.forName(Config.getDBDriverClassName());
 		} catch (ClassNotFoundException e) {
 			System.out.println("예외) 클래스가 없습니다! 프로그램 종료");
 			e.printStackTrace();
@@ -39,7 +36,7 @@ public class ArticleListServlet extends HttpServlet {
 		}
 
 		try {
-			conn = DriverManager.getConnection(url, user, password);
+			conn = DriverManager.getConnection(Config.getDBUrl(), Config.getDBUser(), Config.getDBPswd());
 			
 			// 페이징
 			int page = 1;		// 현재 페이지
