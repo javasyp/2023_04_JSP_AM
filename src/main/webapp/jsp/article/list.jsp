@@ -24,7 +24,7 @@ int totalPage = (int) request.getAttribute("totalPage");
 	
 	<h1>게시물 리스트</h1>
 	
-	<table style="border-collapse: collapse; border-color: green" border="1px">
+	<table style="border-collapse: collapse; border-color: green; width: 500px;" border="1px"">
 		<tr>
 			<th>번호</th>
 			<th>작성날짜</th>
@@ -39,8 +39,8 @@ int totalPage = (int) request.getAttribute("totalPage");
 			<td><%=articleRow.get("id")%></td>
 			<td><%=articleRow.get("regDate")%></td>
 			<td><a href="detail?id=<%=articleRow.get("id")%>"><%=articleRow.get("title")%></a></td>
-			<td><a href="modify?id=<%=articleRow.get("id")%>">upd</a></td>
-			<td><a href="doDelete?id=<%=articleRow.get("id")%>">del</a></td>
+			<td><a href="modify?id=<%=articleRow.get("id")%>">수정</a></td>
+			<td><a href="doDelete?id=<%=articleRow.get("id")%>">삭제</a></td>
 		</tr>
 		<%
 		}
@@ -58,10 +58,34 @@ int totalPage = (int) request.getAttribute("totalPage");
 	</style>
 	
 	<div class="page">
-		<% 
-		for (int i = 1; i <= totalPage; i++) {
+		<%
+		// 페이지 노출 개수 제한
+		if (cPage > 1) {
+		%>
+			<a href="list?page=1">◀</a>
+		<%
+		}
+		int pageSize = 5;	// 양 옆으로 몇개씩 보여줄 것인지
+		int from = cPage - pageSize;
+		
+		if (from < 1) {
+			from = 1;
+		}
+		
+		int end = cPage + pageSize;
+		
+		if (end > totalPage) {
+			end = totalPage;
+		}
+		
+		for (int i = from; i <= end; i++) {
 		%>
 		<a class="<%=cPage == i ? "red" : ""%>" href="list?page=<%=i%>"><%=i%></a>
+		<%
+		}
+		if (cPage < totalPage) {
+		%>
+			<a href="list?page=<%=totalPage%>">▶</a>
 		<%
 		}
 		%>
