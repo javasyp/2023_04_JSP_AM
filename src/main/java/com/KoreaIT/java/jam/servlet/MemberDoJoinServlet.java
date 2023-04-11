@@ -15,8 +15,8 @@ import com.KoreaIT.java.jam.config.Config;
 import com.KoreaIT.java.jam.util.DBUtil;
 import com.KoreaIT.java.jam.util.SecSql;
 
-@WebServlet("/article/doWrite")
-public class ArticleDoWriteServlet extends HttpServlet {
+@WebServlet("/member/doJoin")
+public class MemberDoJoinServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -38,17 +38,19 @@ public class ArticleDoWriteServlet extends HttpServlet {
 			request.setCharacterEncoding("UTF-8");
 			
 			// 파라미터 값 받아오기
-			String title = request.getParameter("title");
-			String body = request.getParameter("body");
+			String loginId = request.getParameter("loginId");
+			String loginPw = request.getParameter("loginPw");
+			String name = request.getParameter("name");
 			
-			SecSql sql = SecSql.from("INSERT INTO article");
+			SecSql sql = SecSql.from("INSERT INTO member");
 			sql.append("SET regDate = NOW(),");
-			sql.append("title = ?,", title);
-			sql.append("`body` = ?;", body);
+			sql.append("loginId = ?,", loginId);
+			sql.append("loginPw = ?,", loginPw);
+			sql.append("`name` = ?;", name);
 			
 			int id = DBUtil.insert(conn, sql);
 			
-			response.getWriter().append(String.format("<script>alert('%d번 글이 생성되었습니다!'); location.replace('list');</script>", id));
+			response.getWriter().append(String.format("<script>alert('%s님 가입되었습니다!'); location.replace('../article/list');</script>", name));
 
 		} catch (SQLException e) {
 			e.printStackTrace();
