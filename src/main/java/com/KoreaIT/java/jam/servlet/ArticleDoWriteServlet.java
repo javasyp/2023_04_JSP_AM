@@ -10,6 +10,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.KoreaIT.java.jam.config.Config;
 import com.KoreaIT.java.jam.util.DBUtil;
@@ -37,12 +38,21 @@ public class ArticleDoWriteServlet extends HttpServlet {
 			conn = DriverManager.getConnection(Config.getDBUrl(), Config.getDBUser(), Config.getDBPswd());
 			request.setCharacterEncoding("UTF-8");
 			
+			HttpSession session = request.getSession();
+			
+			if (session.getAttribute("loginedMemberId") == null) {
+				response.getWriter().append(String.format("<script>alert('로그인 후 이용해 주세요.'); location.replace('../member/login');</script>"));
+				return;
+			}
+			
 			// 파라미터 값 받아오기
 			String title = request.getParameter("title");
 			String body = request.getParameter("body");
+			int memberId = (int) session.getAttribute("loginedMemberId");
 			
 			SecSql sql = SecSql.from("INSERT INTO article");
 			sql.append("SET regDate = NOW(),");
+			sql.append("memberId = ?,", memberId);
 			sql.append("title = ?,", title);
 			sql.append("`body` = ?;", body);
 			

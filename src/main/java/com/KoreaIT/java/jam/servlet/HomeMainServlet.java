@@ -28,7 +28,7 @@ public class HomeMainServlet extends HttpServlet {
 			loginedMemberName = (String) session.getAttribute("loginedMemberName");
 		}
 		
-		// 로그인/로그아웃 상태 저장
+		// 로그인/로그아웃 상태(속성) 저장
 		request.setAttribute("isLogined", isLogined);
 		request.setAttribute("loginedMemberId", loginedMemberId);		// 회원 번호
 		request.setAttribute("loginedMemberName", loginedMemberName);	// 회원 이름
