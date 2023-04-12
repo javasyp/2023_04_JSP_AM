@@ -11,6 +11,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.KoreaIT.java.jam.config.Config;
 import com.KoreaIT.java.jam.util.DBUtil;
@@ -37,12 +38,35 @@ public class ArticleDetailServlet extends HttpServlet {
 		try {
 			conn = DriverManager.getConnection(Config.getDBUrl(), Config.getDBUser(), Config.getDBPswd());
 			
+			// 세션 불러오기
+			HttpSession session = request.getSession();
+			
+			boolean isLogined = false;
+			int loginedMemberId = -1;
+			Map<String, Object> loginedMemberRow = null;
+
+			if (session.getAttribute("loginedMemberId") != null) {
+				isLogined = true;
+				loginedMemberId = (int) session.getAttribute("loginedMemberId");
+
+				SecSql sql = SecSql.from("SELECT * FROM `member`");
+				sql.append("WHERE id = ?", loginedMemberId);
+
+				loginedMemberRow = DBUtil.selectRow(conn, sql);
+			}
+
+			request.setAttribute("isLogined", isLogined);
+			request.setAttribute("loginedMemberId", loginedMemberId);
+			request.setAttribute("loginedMemberRow", loginedMemberRow);
+			
 			// 파라미터 값 받아오기
 			int id = Integer.parseInt(request.getParameter("id"));
 
 			SecSql sql = SecSql.from("SELECT *");
-			sql.append("FROM article");
-			sql.append("WHERE id = ? ;", id);
+			sql.append("FROM article AS A");
+			sql.append("INNER JOIN `member` AS M");
+			sql.append("ON A.memberId = M.id");
+			sql.append("WHERE A.id = ? ;", id);
 
 			Map<String, Object> articleRow = DBUtil.selectRow(conn, sql);
 

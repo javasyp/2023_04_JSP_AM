@@ -18,7 +18,15 @@ public class MemberDoLogoutServlet extends HttpServlet {
 		
 		request.setCharacterEncoding("UTF-8");
 		
+		// 로그인 상태 체크
 		HttpSession session = request.getSession();
+		
+		if (session.getAttribute("loginedMemberId") == null) {
+			response.getWriter().append(String.format("<script>alert('로그인 후 이용해 주세요.'); location.replace('../member/login');</script>"));
+			return;
+		}
+		
+		session = request.getSession();
 		// 저장된 속성 제거
 		session.removeAttribute("loginedMemberId");
 		session.removeAttribute("loginedMemberLoginId");

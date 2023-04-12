@@ -12,6 +12,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.KoreaIT.java.jam.config.Config;
 import com.KoreaIT.java.jam.util.DBUtil;
@@ -38,6 +39,27 @@ public class ArticleListServlet extends HttpServlet {
 		try {
 			conn = DriverManager.getConnection(Config.getDBUrl(), Config.getDBUser(), Config.getDBPswd());
 			
+			// 세션 불러오기
+			HttpSession session = request.getSession();
+			
+			boolean isLogined = false;
+			int loginedMemberId = -1;
+			Map<String, Object> loginedMemberRow = null;
+
+			if (session.getAttribute("loginedMemberId") != null) {
+				isLogined = true;
+				loginedMemberId = (int) session.getAttribute("loginedMemberId");
+
+				SecSql sql = SecSql.from("SELECT * FROM `member`");
+				sql.append("WHERE id = ?", loginedMemberId);
+
+				loginedMemberRow = DBUtil.selectRow(conn, sql);
+			}
+
+			request.setAttribute("isLogined", isLogined);
+			request.setAttribute("loginedMemberId", loginedMemberId);
+			request.setAttribute("loginedMemberRow", loginedMemberRow);
+			
 			// 페이징
 			int page = 1;		// 현재 페이지
 			
@@ -58,8 +80,10 @@ public class ArticleListServlet extends HttpServlet {
 			int totalPage = (int) Math.ceil((double) totalCnt / itemsInAPage);		// 올림
 			
 			sql = SecSql.from("SELECT *");
-			sql.append("FROM article");
-			sql.append("ORDER BY id DESC");
+			sql.append("FROM article AS A");
+			sql.append("INNER JOIN `member` AS M");
+			sql.append("ON A.memberId = M.id");
+			sql.append("ORDER BY A.id DESC");
 			sql.append("LIMIT ?, ?;", limitFrom, itemsInAPage);
 
 			List<Map<String, Object>> articleRows = DBUtil.selectRows(conn, sql);
