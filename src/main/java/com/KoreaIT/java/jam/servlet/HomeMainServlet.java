@@ -21,7 +21,10 @@ import com.KoreaIT.java.jam.util.SecSql;
 public class HomeMainServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
 		response.setContentType("text/html; charset=UTF-8");
+		
+		request.setCharacterEncoding("UTF-8");
 
 		// DB 연결
 		Connection conn = null;
@@ -36,7 +39,6 @@ public class HomeMainServlet extends HttpServlet {
 
 		try {
 			conn = DriverManager.getConnection(Config.getDBUrl(), Config.getDBUser(), Config.getDBPswd());
-			request.setCharacterEncoding("UTF-8");
 			
 			// 세션 불러오기
 			HttpSession session = request.getSession();

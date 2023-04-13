@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -15,31 +14,48 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.KoreaIT.java.jam.config.Config;
+import com.KoreaIT.java.jam.controller.ArticleController;
 import com.KoreaIT.java.jam.util.DBUtil;
 import com.KoreaIT.java.jam.util.SecSql;
 
-@WebServlet("/article/list")
-public class ArticleListServlet extends HttpServlet {
+@WebServlet("/s/*")
+public class DispatcherServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		response.setContentType("text/html; charset=UTF-8");
+		
+		request.setCharacterEncoding("UTF-8");
+		
+		String requestURI = request.getRequestURI();
+		
+		String[] requestURI_Bits = requestURI.split("/");
+		// ~~/s/article/list
+		// [0]/[1]/[2]/[3]
+		
+		System.out.println(requestURI_Bits[0]);
+		System.out.println(requestURI_Bits[1]);
 
+		if (requestURI_Bits.length < 5) {	// 길이가 너무 짧으면 우리한테 없는 기능임
+			response.getWriter().append("올바른 요청이 아닙니다.");
+			return;
+		}
+		
 		// DB 연결
 		Connection conn = null;
-		
+
 		try {
 			Class.forName(Config.getDBDriverClassName());
 		} catch (ClassNotFoundException e) {
-			System.out.println("예외) 클래스가 없습니다! 프로그램 종료");
-			e.printStackTrace();
+			System.out.println("예외 : 클래스가 없습니다");
+			System.out.println("프로그램을 종료합니다");
 			return;
 		}
 
 		try {
 			conn = DriverManager.getConnection(Config.getDBUrl(), Config.getDBUser(), Config.getDBPswd());
 			
-			// 세션 불러오기
+			// 모든 요청에 응답하기 전에 무조건 해야함
 			HttpSession session = request.getSession();
 			
 			boolean isLogined = false;
@@ -60,39 +76,17 @@ public class ArticleListServlet extends HttpServlet {
 			request.setAttribute("loginedMemberId", loginedMemberId);
 			request.setAttribute("loginedMemberRow", loginedMemberRow);
 			
-			// 페이징
-			int page = 1;		// 현재 페이지
-			
-			String paramPage = request.getParameter("page");
-						
-			if (paramPage != null && paramPage.length() != 0) {
-				page = Integer.parseInt(paramPage);
-			}
-			
-			int itemsInAPage = 10;		// 한 페이지에 보이는 글 개수
-			
-			int limitFrom = (page - 1) * itemsInAPage;
-			
-			SecSql sql = SecSql.from("SELECT COUNT(*) AS cnt");
-			sql.append("FROM article;");
-			
-			int totalCnt = DBUtil.selectRowIntValue(conn, sql);		// 페이지 총 개수
-			int totalPage = (int) Math.ceil((double) totalCnt / itemsInAPage);		// 올림
-			
-			sql = SecSql.from("SELECT *");
-			sql.append("FROM article AS A");
-			sql.append("INNER JOIN `member` AS M");
-			sql.append("ON A.memberId = M.id");
-			sql.append("ORDER BY A.id DESC");
-			sql.append("LIMIT ?, ?;", limitFrom, itemsInAPage);
+			String controllerName = requestURI_Bits[3];		// article, member
+			String actionMethodName = requestURI_Bits[4];		// write, modify, join 등
 
-			List<Map<String, Object>> articleRows = DBUtil.selectRows(conn, sql);
-			
-			request.setAttribute("page", page);
-			request.setAttribute("totalPage", totalPage);
-			request.setAttribute("articleRows", articleRows);
-			
-			request.getRequestDispatcher("/jsp/article/list.jsp").forward(request, response);
+			if (controllerName.equals("article")) {
+				ArticleController articleController = new ArticleController(request, response, conn);
+				
+				// 목록
+				if (actionMethodName.equals("list")) {
+					articleController.showList();
+				}
+			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();

@@ -23,6 +23,8 @@ public class MemberDoLoginServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		response.setContentType("text/html; charset=UTF-8");
+		
+		request.setCharacterEncoding("UTF-8");
 
 		// DB 연결
 		Connection conn = null;
@@ -37,7 +39,6 @@ public class MemberDoLoginServlet extends HttpServlet {
 
 		try {
 			conn = DriverManager.getConnection(Config.getDBUrl(), Config.getDBUser(), Config.getDBPswd());
-			request.setCharacterEncoding("UTF-8");
 			
 			// 파라미터 값 받아오기
 			String loginId = request.getParameter("loginId");
